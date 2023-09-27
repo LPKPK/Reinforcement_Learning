@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 from env import BanditEnv
 from tqdm import trange
 
@@ -18,8 +19,22 @@ def q4(k: int, num_samples: int):
     env = BanditEnv(k=k)
     env.reset()
 
-    # TODO
-    pass
+    r_total = []  # list of step rewards
+
+    for i in range(k):  # bandits
+        r_step = []
+
+        for j in range(num_samples):
+            r = env.step(i)  # reward on each step
+            r_step.append(r)
+
+        r_total.append(r_step)
+
+    plt.xlabel('Reward Distribution')
+    plt.ylabel('Action')
+
+    plt.violinplot(r_total, showmedians=1)
+    plt.show()
 
 
 def q6(k: int, trials: int, steps: int):
@@ -75,8 +90,7 @@ def q7(k: int, trials: int, steps: int):
 
 
 def main():
-    # TODO run code for all questions
-    pass
+    q4(10, 2000)
 
 
 if __name__ == "__main__":
