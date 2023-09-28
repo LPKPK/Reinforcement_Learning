@@ -159,10 +159,10 @@ def q7(k: int, trials: int, steps: int):
     # TODO initialize env and agents here
     env = BanditEnv(k)
 
-    e0 = EpsilonGreedy(k, 0, 0) # args: (number of arms, initial Q-values, epsilon)
-    e1 = EpsilonGreedy(k, 5, 0)
-    e2 = EpsilonGreedy(k, 0, 0.1)
-    e3 = EpsilonGreedy(k, 5, 0.1)
+    e0 = EpsilonGreedy(k, 0, 0, 0.1) # args: (number of arms, initial Q-values, epsilon)
+    e1 = EpsilonGreedy(k, 5, 0, 0.1)
+    e2 = EpsilonGreedy(k, 0, 0.1, 0.1)
+    e3 = EpsilonGreedy(k, 5, 0.1, 0.1)
     u1 = UCB(k, 0, 2, 0.1)
 
 
@@ -208,8 +208,6 @@ def q7(k: int, trials: int, steps: int):
     rw_avr = np.average(rw, 0)
     oa_avr = np.average(oa, 0)
     up_avr = np.mean(upper_bound)
-    print('rw_trail', rw_trail)
-    print('rw', rw_avr)
 
     y_rw_err = []
     rw_std = np.std(rw, 0)
@@ -257,8 +255,8 @@ def q7(k: int, trials: int, steps: int):
 
 def main():
     # q4(10, 2000)
-    # q6(10,2000,1000)
-    q7(10,2000,1000)
+    q6(10,2000,1000)
+    # q7(10,2000,1000)
 
 
 if __name__ == "__main__":
