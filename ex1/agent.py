@@ -12,8 +12,8 @@ def argmax(arr: Sequence[float]) -> int:
     Args:
         arr: sequence of values
     """
-    # TODO
-    pass
+    randMax = np.random.choice(np.where(arr == arr.max())[0])
+    return randMax
 
 
 class BanditAgent(ABC):
@@ -83,8 +83,11 @@ class EpsilonGreedy(BanditAgent):
 
         With probability 1 - epsilon, choose the best action (break ties arbitrarily, use argmax() from above). With probability epsilon, choose a random action.
         """
-        # TODO
-        action = None
+        rand = np.random.random()
+        if rand > self.epsilon :        
+            action = argmax(self.Q)
+        else:
+            action = np.random.choice(self.k)
         return action
 
     def update(self, action: int, reward: float) -> None:
@@ -97,14 +100,15 @@ class EpsilonGreedy(BanditAgent):
         self.t += 1
 
         # TODO update self.N
+        self.N[action] += 1
 
         # TODO update self.Q
         # If step_size is given (static step size)
         if self.step_size is not None:
-            pass
+            self.Q[action] = self.Q[action] + (reward - self.Q[action]) * self.step_size
         # If step_size is dynamic (step_size = 1 / N(a))
         else:
-            pass
+            self.Q[action] = self.Q[action] + (reward - self.Q[action]) / self.N[action]
 
 
 class UCB(BanditAgent):

@@ -26,7 +26,7 @@ class BanditEnv:
         Args:
             action (int): index of arm to pull
         """
-        # TODO calculate reward of arm given by action
+        # calculate reward of arm given by action
         reward = np.random.normal(loc=self.means[action], scale=1)
 
         return reward
