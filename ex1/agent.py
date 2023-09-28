@@ -99,10 +99,10 @@ class EpsilonGreedy(BanditAgent):
         """
         self.t += 1
 
-        # TODO update self.N
+        # update self.N
         self.N[action] += 1
 
-        # TODO update self.Q
+        # update self.Q
         # If step_size is given (static step size)
         if self.step_size is not None:
             self.Q[action] = self.Q[action] + (reward - self.Q[action]) * self.step_size
@@ -112,7 +112,7 @@ class EpsilonGreedy(BanditAgent):
 
 
 class UCB(BanditAgent):
-    def __init__(self, k: int, init: int, c: float, step_size: float) -> None:
+    def __init__(self, k: int, init: int, c: float, step_size: Optional[float] = None) -> None:
         """Epsilon greedy bandit agent
 
         Args:
@@ -129,8 +129,12 @@ class UCB(BanditAgent):
 
         Use UCB action selection. Be sure to consider the case when N_t = 0 and break ties randomly (use argmax() from above)
         """
-        # TODO
-        action = None
+        # 
+        if 0 in self.N:     #   the case when self.N = 0
+            action_list = np.where(self.N == 0)[0]
+            action = np.random.choice(action_list)
+        else:
+            action = argmax(self.Q + self.c * np.sqrt(np.log(self.t)/self.N))
         return action
 
     def update(self, action: int, reward: float) -> None:
@@ -142,6 +146,13 @@ class UCB(BanditAgent):
         """
         self.t += 1
 
-        # TODO update self.N
+        # update self.N
+        self.N[action] += 1
 
-        # TODO update self.Q
+        # update self.Q
+        # If step_size is given (static step size)
+        if self.step_size is not None:
+            self.Q[action] = self.Q[action] + (reward - self.Q[action]) * self.step_size
+        # If step_size is dynamic (step_size = 1 / N(a))
+        else:
+            self.Q[action] = self.Q[action] + (reward - self.Q[action]) / self.N[action]
