@@ -101,20 +101,13 @@ def q6(k: int, trials: int, steps: int):
     up_avr = np.mean(upper_bound)
 
     y_rw_err = []
-    y_oa_err = []
-
     rw_std = np.std(rw, 0)
-    oa_std = np.std(oa, 0)
     up_err_std = np.std(upper_bound, 0)
-
     up_err = 1.96 * (up_err_std/np.sqrt(trials))
 
     for p in range(len(agents)):
         err = 1.96 * (rw_std[p]/np.sqrt(trials))
         y_rw_err.append(err)
-
-        oa_err = 1.96 * (oa_std[p]/np.sqrt(trials))
-        y_oa_err.append(oa_err)
 
     # Upper Bound Plot
     plt.figure()
@@ -133,6 +126,8 @@ def q6(k: int, trials: int, steps: int):
 
     for p in range(len(agents)):
         plt.plot(rw_avr[p], label=labels[p], color = colors[p])
+
+    for p in range(len(agents)):
         plt.fill_between(x, rw_avr[p] + y_rw_err[p], rw_avr[p] - y_rw_err[p], alpha = 0.3 , color = colors[p])
 
     plt.legend()
@@ -144,7 +139,6 @@ def q6(k: int, trials: int, steps: int):
 
     for p in range(len(agents)):
         plt.plot(oa_avr[p], label=labels[p], color = colors[p])
-        plt.fill_between(x, oa_avr[p] + y_oa_err[p], oa_avr[p] - y_oa_err[p], alpha = 0.3 , color = colors[p])
 
     plt.legend()
     plt.show()
@@ -216,28 +210,21 @@ def q7(k: int, trials: int, steps: int):
     up_avr = np.mean(upper_bound)
 
     y_rw_err = []
-    y_oa_err = []
-
     rw_std = np.std(rw, 0)
-    oa_std = np.std(oa, 0)
     up_err_std = np.std(upper_bound, 0)
-
     up_err = 1.96 * (up_err_std/np.sqrt(trials))
 
     for p in range(len(agents)):
         err = 1.96 * (rw_std[p]/np.sqrt(trials))
         y_rw_err.append(err)
 
-        oa_err = 1.96 * (oa_std[p]/np.sqrt(trials))
-        y_oa_err.append(oa_err)
-
+    # Upper Bound Plot
     plt.figure()
     plt.xlabel('Steps')
     plt.ylabel('Average Reward')
 
     x = np.arange(steps)
     
-    # Upper Bound Plot
     plt.axhline(y = up_avr, linestyle='--', label='upper bound')
     plt.fill_between(x, up_avr + up_err, up_avr - up_err, alpha = 0.2)
 
@@ -248,6 +235,8 @@ def q7(k: int, trials: int, steps: int):
 
     for p in range(len(agents)):
         plt.plot(rw_avr[p], label=labels[p], color = colors[p])
+
+    for p in range(len(agents)):
         plt.fill_between(x, rw_avr[p] + y_rw_err[p], rw_avr[p] - y_rw_err[p], alpha = 0.3 , color = colors[p])
 
     plt.legend()
@@ -259,8 +248,6 @@ def q7(k: int, trials: int, steps: int):
 
     for p in range(len(agents)):
         plt.plot(oa_avr[p], label=labels[p], color = colors[p])
-        plt.fill_between(x, oa_avr[p] + y_oa_err[p], oa_avr[p] - y_oa_err[p], alpha = 0.3 , color = colors[p])
-
 
     plt.legend()
     plt.show()
@@ -268,8 +255,8 @@ def q7(k: int, trials: int, steps: int):
 
 def main():
     # q4(10, 2000)
-    q6(10,2000,1000)
-    # q7(10,2000,1000)
+    # q6(10,2000,1000)
+    q7(10,2000,1000)
 
 
 if __name__ == "__main__":
