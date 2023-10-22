@@ -296,6 +296,8 @@ class JacksCarRental:
         probs = np.zeros((self.max_cars_start + 1, self.max_cars_end + 1))
         rewards = np.zeros(self.max_cars_start + 1)
 
+        # p_rent, p_return = self.make_likelihood(loc_idx)
+
         for start in range(probs.shape[0]):
             # TODO Calculate average rewards.
             # For all possible s_start, calculate the probability of renting k cars.
@@ -320,9 +322,11 @@ class JacksCarRental:
                 # Be sure to consider the case where business is lost (i.e. renting k > s_start cars)
                 for i in range(min_rent, start):
                     # if (start - end) >= 0:
+                    # prob += p_rent[start][i] * p_return[end][i - (start - end)]
                     prob += self.rent[loc_idx].pmf(i) * self.return_[loc_idx].pmf(i - (start - end))
 
-                # if end != (probs.shape[1]-1) :
+
+                # prob += p_rent[start][start] * self.return_[loc_idx].pmf(end)
                 prob += (1 - self.rent[loc_idx].cdf(start - 1)) * self.return_[loc_idx].pmf(end)
                 
                 probs[start, end] = prob
@@ -344,17 +348,16 @@ class JacksCarRental:
     def make_likelihood(self, loc_idx):
         """
         Create P(Ni' | Ni")
-        """
-        P = np.zeros((self.max_cars_start + 1, self.max_cars_end + 1))
-        
-        N = np.arange(self.max_cars_start + 1)
-        p = self.rent[loc_idx].pmf(N)
+        """        
+        rent = np.arange(self.max_cars_start + 1)
+        retu = np.arange(self.max_cars_end + 1)
+        p = self.rent[loc_idx].pmf(rent)
         px = []   
-        for i in N: px.append(self.right_tail(p[:i+1].copy()))
+        for i in rent: px.append(self.right_tail(p[:i+1].copy()))
         
-        p = self.return_[loc_idx].pmf(N)
+        p = self.return_[loc_idx].pmf(retu)
         py = []
-        for i in N: py.append(self.right_tail(p[:i+1].copy()))
+        for i in retu: py.append(self.right_tail(p[:i+1].copy()))
         
         # for N__ in range(self.max_cars_end + 1):
         #     px_N__ = px[N__]
@@ -368,7 +371,7 @@ class JacksCarRental:
 
         #             P[N_, N__] += px_N__[x] * py_N_[y]
                 
-        return py
+        return px, py
 
 
     
@@ -381,7 +384,19 @@ class JacksCarRental:
             state (Tuple[int,int]): state
             action (int): action
         """
+        # Q6 (a)
         cost = self.move_cost * abs(action)
+
+        # # Q6 (b)
+        # locA_, locB_ = state
+        # if action > 0:
+        #     cost = self.move_cost * (abs(action)-1)
+        # else: cost = self.move_cost * abs(action)
+
+        # if locA_ - action > 10:
+        #     cost += 4
+        # if locB_ + action > 10:
+        #     cost += 4
 
         return cost
 
@@ -498,15 +513,10 @@ class JacksCarRental:
         ret = reward + np.sum(probs * gamma * V)
         return ret
 
-    def Q6_a(self):
+    def Q6(self):
         V_s = np.zeros((self.max_cars_end + 1, self.max_cars_end + 1))
         theta = 0.001
         gamma = 0.9
-        # pi = {   
-        #     0 : "LEFT",
-        #     1 : "DOWN",
-        #     2 : "RIGHT",
-        #     3 : "UP" }
 
         # initialized policy
         policy = [[[np.random.randint(-5, 5)] for _ in range(self.max_cars_end + 1)] for _ in range(self.max_cars_end + 1)]
@@ -546,10 +556,10 @@ class JacksCarRental:
 
             # Print Policy
             plt.figure(figsize=(12, 10))
-            plot = plt.imshow(policy, cmap=plt.get_cmap("Blues"))
+            plot = plt.imshow(policy, cmap="RdGy")
             plt.gca().invert_yaxis()
 
-            bounds = np.arange(-5, 5 + 1)
+            bounds = np.arange(-5, 6)
 
             plt.colorbar(plot, boundaries=bounds, ticks=bounds)
             plt.title(f"Policy at iteration {iteration}")
@@ -576,4 +586,4 @@ class JacksCarRental:
         plt.show()
 
         return V_s, policy
-    
+
