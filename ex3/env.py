@@ -293,7 +293,8 @@ class JacksCarRental:
             probs (np.ndarray): list of probabilities for all possible combination of s_start and s_end
             rewards (np.ndarray): average rewards for all possible s_start
         """
-        probs = np.zeros((self.max_cars_start + 1, self.max_cars_end + 1))
+        probs = np.zeros((self.max_cars_start + 1, 31))
+        # real_probs = np.zeros((self.max_cars_start + 1, self.max_cars_end + 1))
         rewards = np.zeros(self.max_cars_start + 1)
 
         # p_rent, p_return = self.make_likelihood(loc_idx)
@@ -327,13 +328,19 @@ class JacksCarRental:
 
 
                 # prob += p_rent[start][start] * self.return_[loc_idx].pmf(end)
+                # if end != (probs.shape[1] - 1):
                 prob += (1 - self.rent[loc_idx].cdf(start - 1)) * self.return_[loc_idx].pmf(end)
-                
+                # else: prob += (1 - self.rent[loc_idx].cdf(start - 1)) * (1 - self.rent[loc_idx].cdf(end - 1))
                 probs[start, end] = prob
+        
+        sum_last_three = np.sum(probs[:, -10:], axis=1)
+        new_data = probs[:, :-10]
+        new_data = np.column_stack((new_data, sum_last_three))
+        # real_probs = [col[:20] + [sum(col[20:26])] for col in probs]
 
         # probs = self.make_likelihood(loc_idx)
 
-        return probs, rewards
+        return new_data, rewards
 
     # Reward as a function of (N1'', N2'')
     # Total reward is R_X + R_A * |a|

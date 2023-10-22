@@ -30,6 +30,6 @@ if __name__ == '__main__':
     Value,Policy = Jack.Q6()  # For swtiching between Q6a and Q6b, need to comment  out
                             # the different cost function at line 377, in _calculate_cost()
 
-    # px, py = Jack.make_likelihood(0)
-    # print(np.sum(Value, axis =1))
-    # print(py[1][1])
+    # px, py = Jack._open_to_close(1)
+    # print(np.sum(px, axis =1))
+    # print(px[25])
