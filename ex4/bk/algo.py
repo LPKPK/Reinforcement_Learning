@@ -3,7 +3,7 @@ from typing import Callable, Tuple
 from collections import defaultdict
 from tqdm import trange
 import numpy as np
-from policy import create_blackjack_policy, create_epsilon_policy, create_epsilon_policy_race
+from policy import create_blackjack_policy, create_epsilon_policy
 
 
 def generate_episode(env: gym.Env, policy: Callable, es: bool = False):
@@ -60,36 +60,6 @@ def generate_episode_custom(env: gym.Env, policy: Callable, es: bool = False):
         state = next_pos
 
     return episode
-
-
-def generate_episode_race(env: gym.Env, policy: Callable, es: bool = False):
-    """A function to generate one episode and collect the sequence of (s, a, r) tuples
-
-    This function will be useful for implementing the MC methods
-
-    Args:
-        env (gym.Env): a Gym API compatible environment
-        policy (Callable): A function that represents the policy.
-        es (bool): Whether to use exploring starts or not
-    """
-    episode = []
-    state = env.reset()["car"]
-    while True:
-        # print(episode)
-        if es and len(episode) == 0:
-            action = env.action_space.sample()
-        else:
-            action = policy(state)
-
-        next_state, reward, done, truncated, _ = env.step(action)
-        next_pos = next_state["car"]
-        episode.append((state, action, reward))
-        if done or truncated:
-            break
-        state = next_pos
-
-    return episode
-
 
 
 def on_policy_mc_evaluation(
@@ -199,47 +169,4 @@ def on_policy_mc_control_epsilon_soft(
         returns[i] = G
 
     return returns
-
-def on_policy_mc_control_epsilon_soft_race(
-    env: gym.Env, num_episodes: int, gamma: float, epsilon: float
-):
-    """On-policy Monte Carlo policy control for epsilon soft policies.
-
-    Args:
-        env (gym.Env): a Gym API compatible environment
-        num_episodes (int): Number of episodes
-        gamma (float): Discount factor of MDP
-        epsilon (float): Parameter for epsilon soft policy (0 <= epsilon <= 1)
-    Returns:
-
-    """
-    Q = defaultdict(lambda: np.zeros(env.action_space.n))
-    N = defaultdict(lambda: np.zeros(env.action_space.n))
-
-    policy = create_epsilon_policy_race(Q, epsilon)
-
-    returns = np.zeros(num_episodes)
-
-    for i in trange(num_episodes, desc="Episode", leave=False):
-        # TODO Q4
-        # For each episode calculate the return
-        # Update Q
-        # Note there is no need to update the policy here directly.
-        # By updating Q, the policy will automatically be updated.
-        episode = generate_episode_race(env, policy)
-        G = 0
-        S = []
-
-        for t in range(len(episode) - 1, -1, -1):
-            state, action, reward = episode[t]
-            G = reward + gamma * G
-            if state not in S:
-                S.append(state)
-                N[state][action] += 1
-                Q[state][action] = Q[state][action] + (G - Q[state][action]) / N[state][action]
-
-        returns[i] = G
-
-    return returns
-
 

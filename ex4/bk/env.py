@@ -1,6 +1,6 @@
 from enum import IntEnum
 from typing import Tuple, Optional, List
-from gym import Env, spaces
+from gym import Env, spaces, wrappers
 from gym.utils import seeding
 from gym.envs.registration import register
 import numpy as np
@@ -77,8 +77,7 @@ class FourRoomsEnv(Env):
         ]
 
         self.start_pos = (0, 0)
-        # self.elapsed_steps = 0
-        self.truncated = False
+        self.elapsed_steps = 0
         # while True:
         #         self.goal_pos = tuple(np.random.randint(0, 11, size=2))
         #         if self.goal_pos not in self.walls:
@@ -125,7 +124,7 @@ class FourRoomsEnv(Env):
             observation (Tuple[int,int]): returns the initial observation
         """
         self.agent_pos = self.start_pos
-        # self.elapsed_steps = 0
+        self.elapsed_steps = 0
 
         observation = self._get_obs()
         info = self._get_info()
@@ -148,10 +147,10 @@ class FourRoomsEnv(Env):
             info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning). Not used in this assignment.
         """
 
-        # self.elapsed_steps += 1
-        # if self.elapsed_steps > self.spec.max_episode_steps:
-        #     truncated = True
-        # else: truncated = False
+        self.elapsed_steps += 1
+        if self.elapsed_steps > self.spec.max_episode_steps:
+            truncated = True
+        else: truncated = False
 
         # Check if goal was reached
         if self.agent_pos == self.goal_pos:
@@ -159,7 +158,7 @@ class FourRoomsEnv(Env):
             reward = 1.0
             observation = self._get_obs()
 
-            return observation, reward, done, self.truncated, {}
+            return observation, reward, done, truncated, {}
         else:
             done = False
             reward = 0.0
@@ -197,4 +196,5 @@ class FourRoomsEnv(Env):
         observation = self._get_obs()
         info = self._get_info()
 
-        return observation, reward, done, self.truncated, {}
+        return observation, reward, done, truncated, {}
+
